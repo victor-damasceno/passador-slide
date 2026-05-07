@@ -1,1 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Slide Remote</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f0f5;
+    --muted: rgba(240,240,245,0.45);
+    --accent: #7c6cfa;
+    --accent2: #a799ff;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --radius: 20px;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem 1.5rem;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .logo-icon { font-size: 44px; display: block; margin-bottom: 0.75rem; }
+  .logo h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo p { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 400; }
+
+  .screen { display: none; flex-direction: column; gap: 12px; animation: fadeUp 0.25s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Botões de modo */
+  .mode-btn {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: 'Syne', sans-serif;
+  }
+  .mode-btn:active { transform: scale(0.97); background: var(--surface2); }
+  .mode-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .mode-icon.purple { background: rgba(124,108,250,0.18); }
+  .mode-icon.green  { background: rgba(74,222,128,0.15); }
+  .mode-label { font-size: 15px; font-weight: 600; }
+  .mode-sub   { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+  /* Caixa do código */
+  .code-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    text-align: center;
+  }
+  .code-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.75rem; }
+  .code-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 46px;
+    font-weight: 500;
+    letter-spacing: 10px;
+    color: var(--accent2);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+  .code-hint { font-size: 12px; color: var(--muted); }
+
+  .copy-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none; border: 1px solid var(--border2); border-radius: 8px;
+    color: var(--muted); font-size: 12px; padding: 6px 14px;
+    cursor: pointer; font-family: 'Syne', sans-serif; margin-top: 10px;
+    transition: all 0.15s;
+  }
+  .copy-btn:active { background: var(--surface2); color: var(--text); }
+
+  /* Status */
+  .status {
+    display: flex; align-items: center; gap: 8px;
+    justify-content: center; font-size: 13px; color: var(--muted);
+    padding: 0.6rem 1rem;
+    background: var(--surface); border-radius: 50px; border: 1px solid var(--border);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); transition: all 0.3s; flex-shrink: 0; }
+  .dot.on  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.err { background: var(--red); }
+
+  /* Input */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+  input[type=text] {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 0.75rem 1rem;
+    font-size: 28px; text-align: center;
+    letter-spacing: 6px; font-family: 'DM Mono', monospace;
+    color: var(--text); outline: none; width: 100%;
+    -webkit-appearance: none; transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--accent); }
+
+  /* Botões */
+  .btn {
+    padding: 0.9rem; border-radius: 14px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    border: none; transition: all 0.15s;
+    font-family: 'Syne', sans-serif; width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 13px; padding: 0.7rem; }
+
+  /* Botões de navegação */
+  .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .nav-btn {
+    aspect-ratio: 1; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--surface);
+    color: var(--text); cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.1s;
+    -webkit-user-select: none; user-select: none;
+    font-family: 'Syne', sans-serif;
+  }
+  .nav-btn.pressed { background: var(--surface2); border-color: var(--accent); transform: scale(0.95); }
+  .nav-arrow { font-size: 52px; line-height: 1; }
+  .nav-text { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+  .err-msg  { font-size: 13px; color: var(--red); text-align: center; min-height: 18px; }
+  .feedback { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; transition: opacity 0.3s; }
+  .last-cmd { text-align: center; font-size: 13px; color: var(--green); min-height: 20px; font-family: 'DM Mono', monospace; }
+  .divider  { height: 1px; background: var(--border); margin: 4px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">
+    <span class="logo-icon">📡</span>
+    <h1>Slide Remote</h1>
+    <p>Controle seus slides de qualquer lugar</p>
+  </div>
+
+  <!-- Tela inicial -->
+  <div class="screen active" id="screen-home">
+    <button class="mode-btn" onclick="selectMode('receiver')">
+      <div class="mode-icon purple">🖥️</div>
+      <div>
+        <div class="mode-label">Computador / Receptor</div>
+        <div class="mode-sub">Gera o código — abrir onde estão os slides</div>
+      </div>
+    </button>
+    <button class="mode-btn" onclick="selectMode('controller')">
+      <div class="mode-icon green">📱</div>
+      <div>
+        <div class="mode-label">Controle remoto</div>
+        <div class="mode-sub">Digita o código — abrir no celular</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Tela: receptor (computador) -->
+  <div class="screen" id="screen-receiver">
+    <div class="code-box">
+      <div class="code-label">Seu código de acesso</div>
+      <div class="code-number" id="my-code">···</div>
+      <div class="code-hint">Compartilhe com o controle remoto</div>
+      <button class="copy-btn" id="btn-copy" onclick="copyCode()">📋 Copiar código</button>
+    </div>
+
+    <div class="status">
+      <div class="dot" id="dot-r"></div>
+      <span id="status-r">Conectando ao servidor...</span>
+    </div>
+
+    <div class="last-cmd" id="last-cmd"></div>
+    <div class="divider"></div>
+    <button class="btn btn-ghost" onclick="goHome()">← Voltar</button>
+  </div>
+
+  <!-- Tela: controle (celular) -->
+  <div class="screen" id="screen-controller">
+
+    <div id="form-connect" style="display:flex; flex-direction:column; gap:12px;">
+      <div class="field">
+        <label>Código do computador</label>
+        <input type="text" id="code-input" inputmode="numeric" pattern="[0-9]*"
+          placeholder="000000" maxlength="6"
+          oninput="this.value=this.value.replace(/\D/g,'')">
+      </div>
+      <button class="btn btn-primary" id="btn-conn" onclick="connectAsController()">Conectar</button>
+      <div class="err-msg" id="ctrl-err"></div>
+      <div class="divider"></div>
+      <button class="btn btn-ghost" onclick="goHome()">← Voltar</button>
+    </div>
+
+    <div id="nav-controls" style="display:none; flex-direction:column; gap:12px;">
+      <div class="status">
+        <div class="dot on"></div>
+        <span>Conectado</span>
+      </div>
+
+      <div class="nav-grid">
+        <button class="nav-btn" id="btn-prev"
+          ontouchstart="press('prev')" ontouchend="release('prev')"
+          onmousedown="press('prev')" onmouseup="release('prev')" onmouseleave="release('prev')">
+          <div class="nav-arrow">◀</div>
+          <div class="nav-text">Anterior</div>
+        </button>
+        <button class="nav-btn" id="btn-next"
+          ontouchstart="press('next')" ontouchend="release('next')"
+          onmousedown="press('next')" onmouseup="release('next')" onmouseleave="release('next')">
+          <div class="nav-arrow">▶</div>
+          <div class="nav-text">Próximo</div>
+        </button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <div class="divider"></div>
+      <button class="btn btn-ghost" onclick="disconnectController()">Desconectar</button>
+    </div>
+
+  </div>
+
+</div>
+<script>
+// URL do servidor WebSocket — troque pelo seu domínio do Glitch após subir
+const WS_URL = location.origin.replace(/^http/, 'ws');
+
+let ws = null;
+let myCode = null;
+let myRole = null;
+let lastSent = 0;
+
+// ── Navegação de telas ────────────────────────────────────────────────────────
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() {
+  closeWs();
+  myCode = null; myRole = null;
+  document.getElementById('my-code').textContent = '···';
+  document.getElementById('code-input').value = '';
+  document.getElementById('ctrl-err').textContent = '';
+  document.getElementById('nav-controls').style.display = 'none';
+  document.getElementById('form-connect').style.display = 'flex';
+  document.getElementById('btn-conn').disabled = false;
+  document.getElementById('btn-conn').textContent = 'Conectar';
+  show('screen-home');
+}
+
+function closeWs() {
+  if (ws) { try { ws.close(); } catch(e){} ws = null; }
+}
+
+// ── WebSocket helpers ─────────────────────────────────────────────────────────
+
+function connectWS(onOpen) {
+  closeWs();
+  ws = new WebSocket(WS_URL);
+  ws.onopen = onOpen;
+  ws.onerror = () => {};
+  return ws;
+}
+
+// ── Modo receptor (computador) ────────────────────────────────────────────────
+
+function selectMode(mode) {
+  myRole = mode;
+  if (mode === 'receiver') {
+    show('screen-receiver');
+    initReceiver();
+  } else {
+    show('screen-controller');
+  }
+}
+
+function generateCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function initReceiver() {
+  myCode = generateCode();
+  document.getElementById('my-code').textContent = myCode;
+  document.getElementById('status-r').textContent = 'Conectando ao servidor...';
+  document.getElementById('dot-r').className = 'dot';
+
+  connectWS(() => {
+    ws.send(JSON.stringify({ type: 'join', role: 'receiver', code: myCode }));
+    document.getElementById('status-r').textContent = 'Aguardando controle remoto...';
+    document.getElementById('dot-r').style.background = 'var(--amber)';
+  });
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+
+    if (msg.type === 'peer_connected') {
+      document.getElementById('dot-r').classList.add('on');
+      document.getElementById('status-r').textContent = 'Controle conectado!';
+    }
+
+    if (msg.type === 'peer_disconnected') {
+      document.getElementById('dot-r').classList.remove('on');
+      document.getElementById('status-r').textContent = 'Aguardando controle remoto...';
+    }
+
+    if (msg.type === 'cmd') {
+      const el = document.getElementById('last-cmd');
+      if (msg.cmd === 'next') {
+        simulateKey('ArrowRight');
+        el.textContent = '▶ Avançou slide';
+      } else if (msg.cmd === 'prev') {
+        simulateKey('ArrowLeft');
+        el.textContent = '◀ Voltou slide';
+      }
+      setTimeout(() => { el.textContent = ''; }, 1800);
+    }
+  };
+
+  ws.onclose = () => {
+    document.getElementById('dot-r').classList.remove('on');
+    document.getElementById('status-r').textContent = 'Desconectado. Reconectando...';
+    setTimeout(() => { if (myRole === 'receiver') initReceiver(); }, 3000);
+  };
+}
+
+function simulateKey(key) {
+  // Simula tecla no navegador — funciona para Google Slides, PDFs no navegador, etc.
+  document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+  // Tenta também na janela pai (caso esteja em iframe)
+  try { window.parent.document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })); } catch(e){}
+}
+
+function copyCode() {
+  if (!myCode) return;
+  navigator.clipboard.writeText(myCode).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => { btn.textContent = '📋 Copiar código'; }, 2000);
+  }).catch(() => alert('Código: ' + myCode));
+}
+
+// ── Modo controle (celular) ───────────────────────────────────────────────────
+
+function connectAsController() {
+  const code = document.getElementById('code-input').value.trim();
+  const err  = document.getElementById('ctrl-err');
+  const btn  = document.getElementById('btn-conn');
+
+  if (code.length < 6) { err.textContent = 'Digite o código de 6 dígitos.'; return; }
+
+  err.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Conectando...';
+  myCode = code;
+
+  connectWS(() => {
+    ws.send(JSON.stringify({ type: 'join', role: 'controller', code }));
+  });
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'peer_connected') {
+      document.getElementById('form-connect').style.display = 'none';
+      document.getElementById('nav-controls').style.display = 'flex';
+    }
+  };
+
+  ws.onerror = () => {
+    err.textContent = 'Erro de conexão. Tente novamente.';
+    btn.disabled = false; btn.textContent = 'Conectar';
+  };
+
+  ws.onclose = () => {
+    if (document.getElementById('nav-controls').style.display === 'flex') {
+      document.getElementById('nav-controls').style.display = 'none';
+      document.getElementById('form-connect').style.display = 'flex';
+      err.textContent = 'Conexão encerrada.';
+      btn.disabled = false; btn.textContent = 'Conectar';
+    }
+  };
+
+  // Timeout se o receptor não aparecer
+  setTimeout(() => {
+    if (document.getElementById('nav-controls').style.display !== 'flex') {
+      err.textContent = 'Receptor não encontrado. Verifique o código.';
+      btn.disabled = false; btn.textContent = 'Conectar';
+      closeWs();
+    }
+  }, 10000);
+}
+
+function disconnectController() {
+  closeWs();
+  document.getElementById('nav-controls').style.display = 'none';
+  document.getElementById('form-connect').style.display = 'flex';
+  document.getElementById('btn-conn').disabled = false;
+  document.getElementById('btn-conn').textContent = 'Conectar';
+  document.getElementById('ctrl-err').textContent = 'Desconectado.';
+}
+
+// ── Enviar comandos ───────────────────────────────────────────────────────────
+
+function press(cmd) {
+  document.getElementById(cmd === 'next' ? 'btn-next' : 'btn-prev').classList.add('pressed');
+  const now = Date.now();
+  if (now - lastSent < 350) return;
+  lastSent = now;
+
+  if (ws && ws.readyState === 1) {
+    ws.send(JSON.stringify({ type: 'cmd', cmd }));
+    const fb = document.getElementById('feedback');
+    fb.style.opacity = '1';
+    fb.textContent = cmd === 'next' ? '▶ Próximo slide' : '◀ Slide anterior';
+    setTimeout(() => { fb.style.opacity = '0'; }, 900);
+  }
+}
+
+function release(cmd) {
+  document.getElementById(cmd === 'next' ? 'btn-next' : 'btn-prev').classList.remove('pressed');
+}
+</script>
+</body>
+</html>
