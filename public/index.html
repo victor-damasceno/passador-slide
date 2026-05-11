@@ -177,7 +177,9 @@
 <body>
 <div class="wrap">
 
-  <div class="logo" style="margin-top: auto;">
+  <div style="margin: auto 0; display: flex; flex-direction: column; gap: 0;">
+
+  <div class="logo">
     <span class="logo-icon">📡</span>
     <h1>Slide Remote</h1>
     <p>Controle seus slides de qualquer lugar</p>
@@ -186,7 +188,7 @@
   <!-- Tela: digitar código (padrão ao abrir) -->
   <div class="screen active" id="screen-controller">
 
-    <div id="form-connect" style="display:flex; flex-direction:column; gap:12px; margin-top: 1.5rem;">
+    <div id="form-connect" style="display:flex; flex-direction:column; gap:12px;">
       <div class="field">
         <label>Código do computador</label>
         <input type="text" id="code-input" inputmode="numeric" pattern="[0-9]*"
@@ -228,7 +230,10 @@
       </div>
     </div>
 
-</div>
+  </div><!-- fecha screen-controller -->
+  </div><!-- fecha margin:auto -->
+
+</div><!-- fecha wrap -->
 <script>
 const WS_URL = location.origin.replace(/^http/, 'ws');
 
