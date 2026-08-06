@@ -1,106 +1,60 @@
-<<<<<<< HEAD
-# 📡 Slide Remote
+# Passador de Slides
 
-Controle remoto de apresentações em tempo real via celular, sem mesma rede Wi-Fi, sem Bluetooth, sem cabo.
+Este projeto foi desenvolvido para facilitar o controle de apresentações de slides a partir de um navegador. A ideia é permitir que um dispositivo envie comandos para outro de forma simples, tornando a navegação entre os slides mais prática.
 
-## 📌 Sobre o projeto
+O projeto utiliza **Node.js** no backend e uma interface web simples para realizar a comunicação entre cliente e servidor.
 
-O Slide Remote permite que apresentadores controlem slides do PowerPoint, PDF e outros programas usando o **celular como controle remoto**, independentemente da rede em que cada dispositivo está conectado.
+## Tecnologias utilizadas
 
-A comunicação acontece através de um servidor intermediário na nuvem via **WebSocket**, garantindo baixa latência e funcionamento em qualquer ambiente.
-
-
-## 🏗️ Arquitetura
-
-```
-[Celular — site no browser]
-         |
-         | WebSocket (wss://)
-         ▼
-[Servidor Node.js — Render]
-         |
-         | WebSocket (wss://)
-         ▼
-[Aplicativo .exe — Windows]
-         |
-         | pyautogui (API do SO)
-         ▼
-[PowerPoint / PDF / qualquer programa]
-```
-
-### Sistema de salas por código
-
-Ao abrir o `.exe`, um código de 6 dígitos é gerado e uma **sala** é criada no servidor com esse código. O celular digita o mesmo código e entra na mesma sala, estabelecendo a comunicação entre os dois dispositivos.
-
-
-## 🗂️ Estrutura do repositório
-
-```
-passador-slide/
-├── public/
-│   └── index.html        # Interface web para o celular
-├── server.js             # Servidor WebSocket (Node.js)
-└── package.json          # Dependências e configuração
-```
-
-> O aplicativo desktop (`.exe`) está em um repositório separado e é distribuído via release.
-
-
-## 📱 Como usar na prática
-
-1. **No computador:** abra o `SlideRemote.exe` — um código de 6 dígitos é gerado na tela
-2. **No celular:** acesse o link do site, digite o código e clique em **Conectar**
-3. **Pronto:** use as setas ◀ ▶ no celular para passar os slides
-
-
-## 🛠️ Tecnologias
-
-| Tecnologia | Uso |
-|---|---|
-| Node.js + Express | Servidor HTTP e roteamento |
-| ws | Servidor WebSocket e gerenciamento de salas |
-| HTML / CSS / JS | Interface web responsiva para celular |
-| Python + Tkinter | Aplicativo desktop Windows |
-| pyautogui | Simulação de teclas via API do sistema operacional |
-| Render | Hospedagem do servidor na nuvem |
-
-
-## 📄 Licença
-
-Este projeto é de uso livre para fins pessoais e educacionais.
-=======
-# Slide Remote (Passador de Slides)
-
-Controle a apresentação de slides do seu computador remotamente pelo celular, via WebSocket.
+* HTML5
+* CSS3
+* JavaScript
+* Node.js
+* Express
+* Socket.IO
 
 ## Estrutura do projeto
 
-```
+```text
 passador-slide/
-├── server.js              # Servidor Express + WebSocket - salas por código
+├── public/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── controller.js
+│   └── index.html
+├── server.js
 ├── package.json
-├── .gitignore
-└── public/
-    ├── index.html          # Interface - tela do controlador
-    ├── css/
-    │   └── style.css        # Estilos
-    └── js/
-        └── controller.js    # Lógica de conexão WebSocket e envio de comandos
+└── README.md
 ```
 
-## Como rodar
+## Como utilizar
 
-```bash
-npm install
-npm start
-```
+Para utilizar a aplicação, siga os passos abaixo:
 
-O servidor sobe em `http://localhost:3000`, ou então na porta definida em `PORT`.
+1. Acesse a página do projeto hospedada na Vercel.
+2. Baixe a versão mais recente do aplicativo (`.exe`).
+3. Execute o aplicativo no computador. Ao iniciar, ele irá gerar um código de conexão.
+4. Acesse a aplicação web, através do celular, hospedada no Render.
+5. Informe o código gerado pelo aplicativo para estabelecer a conexão.
+6. Após a conexão ser realizada, você poderá controlar a apresentação de slides diretamente pelo navegador.
 
-## Como funciona
+> **Vercel (download do aplicativo):** https://site-slide-remote.vercel.app/
+> **Render (aplicação web):** https://passador-slide.onrender.com/
 
-- O `server.js` cria "salas" identificadas por um código de 6 dígitos.
-- Cada sala tem dois papéis: `receiver` que é o computador que está exibindo os slides e `controller` que é o celular que envia os comandos.
-- O celular se conecta como `controller`, informando o código da sala.
-- Comandos (`next` / `prev`) enviados pelo controlador são repassados via WebSocket para o `receiver`.
->>>>>>> 4fd04ea (chore: reorganiza estrutura de arquivos)
+
+## Objetivo
+
+Este projeto foi criado como uma forma de praticar conceitos de desenvolvimento web, comunicação em tempo real utilizando Socket.IO e organização de aplicações Node.js. Além da funcionalidade em si, ele também serviu para aprofundar conhecimentos sobre estruturação de projetos e boas práticas de desenvolvimento.
+
+## Melhorias futuras
+
+* Interface mais moderna e responsiva.
+* Autenticação entre os dispositivos.
+* Suporte para diferentes modos de apresentação.
+* Histórico de conexões.
+* Configuração personalizada das teclas de controle.
+
+## Licença
+
+Este projeto está disponível para estudos e fins educacionais.
