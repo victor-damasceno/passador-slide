@@ -6,175 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Slide Remote</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5722920199902400"
      crossorigin="anonymous"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: rgba(255,255,255,0.08);
-    --border2: rgba(255,255,255,0.15);
-    --text: #f0f0f5;
-    --muted: rgba(240,240,245,0.45);
-    --accent: #7c6cfa;
-    --accent2: #a799ff;
-    --green: #4ade80;
-    --amber: #fbbf24;
-    --red: #f87171;
-    --radius: 20px;
-  }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-  }
-
-  body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100dvh;
-  }
-
-  .wrap {
-    width: 100%;
-    max-width: 400px;
-    padding: 2rem 1.5rem;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .logo {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  .logo-icon { font-size: 44px; display: block; margin-bottom: 0.75rem; }
-  .logo h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-  .logo p { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 400; }
-
-  .screen { display: none; flex-direction: column; gap: 12px; animation: fadeUp 0.25s ease; }
-  .screen.active { display: flex; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-
-  /* Botões de modo */
-  .mode-btn {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.25rem;
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-    text-align: left;
-    transition: all 0.15s;
-    font-family: 'Syne', sans-serif;
-  }
-  .mode-btn:active { transform: scale(0.97); background: var(--surface2); }
-  .mode-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-  .mode-icon.purple { background: rgba(124,108,250,0.18); }
-  .mode-icon.green  { background: rgba(74,222,128,0.15); }
-  .mode-label { font-size: 15px; font-weight: 600; }
-  .mode-sub   { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
-
-  /* Caixa do código */
-  .code-box {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 1.75rem;
-    text-align: center;
-  }
-  .code-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.75rem; }
-  .code-number {
-    font-family: 'DM Mono', monospace;
-    font-size: 46px;
-    font-weight: 500;
-    letter-spacing: 10px;
-    color: var(--accent2);
-    line-height: 1;
-    margin-bottom: 0.75rem;
-  }
-  .code-hint { font-size: 12px; color: var(--muted); }
-
-  .copy-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: none; border: 1px solid var(--border2); border-radius: 8px;
-    color: var(--muted); font-size: 12px; padding: 6px 14px;
-    cursor: pointer; font-family: 'Syne', sans-serif; margin-top: 10px;
-    transition: all 0.15s;
-  }
-  .copy-btn:active { background: var(--surface2); color: var(--text); }
-
-  /* Status */
-  .status {
-    display: flex; align-items: center; gap: 8px;
-    justify-content: center; font-size: 13px; color: var(--muted);
-    padding: 0.6rem 1rem;
-    background: var(--surface); border-radius: 50px; border: 1px solid var(--border);
-  }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); transition: all 0.3s; flex-shrink: 0; }
-  .dot.on  { background: var(--green); box-shadow: 0 0 8px var(--green); }
-  .dot.err { background: var(--red); }
-
-  /* Input */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
-  input[type=text] {
-    background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: 12px; padding: 0.75rem 1rem;
-    font-size: 28px; text-align: center;
-    letter-spacing: 6px; font-family: 'DM Mono', monospace;
-    color: var(--text); outline: none; width: 100%;
-    -webkit-appearance: none; transition: border-color 0.2s;
-  }
-  input:focus { border-color: var(--accent); }
-
-  /* Botões */
-  .btn {
-    padding: 0.9rem; border-radius: 14px;
-    font-size: 15px; font-weight: 600; cursor: pointer;
-    border: none; transition: all 0.15s;
-    font-family: 'Syne', sans-serif; width: 100%;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-ghost { background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 13px; padding: 0.7rem; }
-
-  /* Botões de navegação */
-  .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .nav-btn {
-    aspect-ratio: 1; border-radius: var(--radius);
-    border: 2px solid var(--border2); background: var(--surface);
-    color: var(--text); cursor: pointer;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 10px;
-    transition: all 0.1s;
-    -webkit-user-select: none; user-select: none;
-    font-family: 'Syne', sans-serif;
-    box-shadow: 0 0 0 1px rgba(124,108,250,0.15), inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .nav-btn:hover { border-color: var(--accent); background: var(--surface2); }
-  .nav-btn.pressed { background: var(--surface2); border-color: var(--accent); transform: scale(0.95); box-shadow: 0 0 16px rgba(124,108,250,0.3); }
-  .nav-arrow { font-size: 56px; line-height: 1; }
-  .nav-text { font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
-
-  .disconnect-wrap { margin-top: auto; padding-top: 16px; }
-  .err-msg  { font-size: 13px; color: var(--red); text-align: center; min-height: 18px; }
-  .feedback { text-align: center; font-size: 13px; color: var(--muted); min-height: 20px; transition: opacity 0.3s; }
-  .last-cmd { text-align: center; font-size: 13px; color: var(--green); min-height: 20px; font-family: 'DM Mono', monospace; }
-  .divider  { height: 1px; background: var(--border); margin: 4px 0; }
-</style>
 </head>
 <body>
 <div class="wrap">
@@ -187,7 +21,7 @@
     <p>Controle seus slides de qualquer lugar</p>
   </div>
 
-  <!-- Tela: digitar código (padrão ao abrir) -->
+  <!-- Tela de digitar o codigo -->
   <div class="screen active" id="screen-controller">
 
     <div id="form-connect" style="display:flex; flex-direction:column; gap:12px;">
@@ -201,7 +35,7 @@
       <button class="btn btn-primary" id="btn-conn" onclick="connectAsController()">Conectar</button>
     </div>
 
-    <!-- Controles após conectar -->
+    <!-- Controles apos conectar -->
     <div id="nav-controls" style="display:none; flex-direction:column; gap:14px; flex:1;">
 
       <div class="status">
@@ -236,104 +70,6 @@
   </div><!-- fecha margin:auto -->
 
 </div><!-- fecha wrap -->
-<script>
-const WS_URL = location.origin.replace(/^http/, 'ws');
-
-let ws = null;
-let myCode = null;
-let lastSent = 0;
-
-function closeWs() {
-  if (ws) { try { ws.close(); } catch(e){} ws = null; }
-}
-
-function connectWS(onOpen) {
-  closeWs();
-  ws = new WebSocket(WS_URL);
-  ws.onopen = onOpen;
-  ws.onerror = () => {};
-  return ws;
-}
-
-// ── Modo controle (celular) ───────────────────────────────────────────────────
-
-function connectAsController() {
-  const code = document.getElementById('code-input').value.trim();
-  const err  = document.getElementById('ctrl-err');
-  const btn  = document.getElementById('btn-conn');
-
-  if (code.length < 6) { err.textContent = 'Digite o código de 6 dígitos.'; return; }
-
-  err.textContent = '';
-  btn.disabled = true;
-  btn.textContent = 'Conectando...';
-  myCode = code;
-
-  connectWS(() => {
-    ws.send(JSON.stringify({ type: 'join', role: 'controller', code }));
-  });
-
-  ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    if (msg.type === 'peer_connected') {
-      document.getElementById('form-connect').style.display = 'none';
-      document.getElementById('nav-controls').style.display = 'flex';
-    }
-  };
-
-  ws.onerror = () => {
-    err.textContent = 'Erro de conexão. Tente novamente.';
-    btn.disabled = false; btn.textContent = 'Conectar';
-  };
-
-  ws.onclose = () => {
-    if (document.getElementById('nav-controls').style.display === 'flex') {
-      document.getElementById('nav-controls').style.display = 'none';
-      document.getElementById('form-connect').style.display = 'flex';
-      err.textContent = 'Conexão encerrada.';
-      btn.disabled = false; btn.textContent = 'Conectar';
-    }
-  };
-
-  setTimeout(() => {
-    if (document.getElementById('nav-controls').style.display !== 'flex') {
-      err.textContent = 'Receptor não encontrado. Verifique o código.';
-      btn.disabled = false; btn.textContent = 'Conectar';
-      closeWs();
-    }
-  }, 10000);
-}
-
-function disconnectController() {
-  closeWs();
-  document.getElementById('nav-controls').style.display = 'none';
-  document.getElementById('form-connect').style.display = 'flex';
-  document.getElementById('btn-conn').disabled = false;
-  document.getElementById('btn-conn').textContent = 'Conectar';
-  document.getElementById('code-input').value = '';
-  document.getElementById('ctrl-err').textContent = 'Desconectado.';
-}
-
-// ── Enviar comandos ───────────────────────────────────────────────────────────
-
-function press(cmd) {
-  document.getElementById(cmd === 'next' ? 'btn-next' : 'btn-prev').classList.add('pressed');
-  const now = Date.now();
-  if (now - lastSent < 350) return;
-  lastSent = now;
-
-  if (ws && ws.readyState === 1) {
-    ws.send(JSON.stringify({ type: 'cmd', cmd }));
-    const fb = document.getElementById('feedback');
-    fb.style.opacity = '1';
-    fb.textContent = cmd === 'next' ? '▶ Próximo slide' : '◀ Slide anterior';
-    setTimeout(() => { fb.style.opacity = '0'; }, 900);
-  }
-}
-
-function release(cmd) {
-  document.getElementById(cmd === 'next' ? 'btn-next' : 'btn-prev').classList.remove('pressed');
-}
-</script>
+<script src="js/controller.js"></script>
 </body>
 </html>

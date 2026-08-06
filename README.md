@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 📡 Slide Remote
 
 Controle remoto de apresentações em tempo real via celular, sem mesma rede Wi-Fi, sem Bluetooth, sem cabo.
@@ -67,3 +68,39 @@ passador-slide/
 ## 📄 Licença
 
 Este projeto é de uso livre para fins pessoais e educacionais.
+=======
+# Slide Remote (Passador de Slides)
+
+Controle a apresentação de slides do seu computador remotamente pelo celular, via WebSocket.
+
+## Estrutura do projeto
+
+```
+passador-slide/
+├── server.js              # Servidor Express + WebSocket - salas por código
+├── package.json
+├── .gitignore
+└── public/
+    ├── index.html          # Interface - tela do controlador
+    ├── css/
+    │   └── style.css        # Estilos
+    └── js/
+        └── controller.js    # Lógica de conexão WebSocket e envio de comandos
+```
+
+## Como rodar
+
+```bash
+npm install
+npm start
+```
+
+O servidor sobe em `http://localhost:3000`, ou então na porta definida em `PORT`.
+
+## Como funciona
+
+- O `server.js` cria "salas" identificadas por um código de 6 dígitos.
+- Cada sala tem dois papéis: `receiver` que é o computador que está exibindo os slides e `controller` que é o celular que envia os comandos.
+- O celular se conecta como `controller`, informando o código da sala.
+- Comandos (`next` / `prev`) enviados pelo controlador são repassados via WebSocket para o `receiver`.
+>>>>>>> 4fd04ea (chore: reorganiza estrutura de arquivos)
